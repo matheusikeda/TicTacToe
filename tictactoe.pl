@@ -78,7 +78,7 @@ get_diagonal2([H|L],L1,Length,R):-get_elem(Length,H,Y),
 % verifica se deu velha, retorna true caso nao tenha mais nenhum espaco vazio. Retorna 1 se tabuleiro cheio
 draw([],1).
 draw([H|L],R):-not(member('.',H)),
-             draw(L,R).
+               draw(L,R).
 
 % verifica vitoria
 % retorna 1 se vitoria, 0 se empate USA ESSA PARA VERIFICAR SITUACAO DO TABULEIRO
@@ -86,7 +86,8 @@ win(E,L,R):-win_rows(E,L,R);
             win_diagonal1(E,L,R);
             win_diagonal2(E,L,R);
             win_columns(E,L,1,R);
-            draw(L,R),!,fail.
+            draw(L,R),
+            write('Game over'),!,fail.
 win(_,_,0).
 
 
@@ -120,7 +121,8 @@ replace_matrix(L,Pos,E,NL):-length(L,T),
 
 cls:-write('\e[H\e[2J'). % limpa a tela
 
-inicio:-tamanho(N),jogo(N),!.  
+inicio:-board_length(N),
+        inicialize(N),!.  
 
 board_length(N):-repeat, 
                  get_length,
@@ -159,6 +161,8 @@ get_position2(Pos,N):-repeat,
 position2:-write('Informe a posicao (1 ~ N*N): player 2'),nl.
 
 
-end(1):-write('Game over!'),nl.
+end(1):-write('Game over!'),
+        nl,
+        inicio.
 end(0):-write('Proximo jogador!'),nl.
-    
+
