@@ -126,14 +126,15 @@ inicio:-board_length(N),
 
 board_length(N):-repeat, 
                  get_length,
-                 read(N), N>2, !. % repete enquanto N <= 2
+                 read(N), N>2, !. % repete enquanto N > 2
 
 get_length:-write('Jogo da Velha NxN, Informe o tamanho do tabuleiro:'), nl.
 
 inicialize(N):-board_builder(N,[],M),
                printBoard(M),
                state(M,N).
-             
+                   
+                                  
 state(M,N):-get_position1(Pos1,N),
             replace_matrix(M,Pos1,'X',NM),
             printBoard(NM),
@@ -147,22 +148,29 @@ state(M,N):-get_position1(Pos1,N),
             state(NM2,N).
 
 get_position1(Pos,N):-repeat,
-                      position1,
+                      position1(N),
                       read(Pos),
                       Pos < N*N + 1. 
 
-position1:-write('Informe a posicao (1 ~ N*N): player 1'),nl.
+position1(N):-write('Informe a posicao: 1~'),
+              R is N*N,
+              write(R),nl.
 
 get_position2(Pos,N):-repeat,
-                      position2,
+                      position2(N),
                       read(Pos),
                       Pos < N*N + 1. 
 
-position2:-write('Informe a posicao (1 ~ N*N): player 2'),nl.
-
+position2(N):-write('Informe a posicao: 1~'),
+              R is N*N,
+              write(R),nl.
 
 end(1):-write('Game over!'),
+        nl,
         nl,
         inicio.
 end(0):-write('Proximo jogador!'),nl.
 
+% contra o computador
+% pessoa comeca
+% check_board(M,NM):-
