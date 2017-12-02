@@ -1,9 +1,10 @@
+% Matheus Ikeda, Gildomar
 % adiciona um elemento na lista
 add_elem(E,L,[E|L]).
 
 % cria uma lista de Length elementos zerados
 row_builder(Length,L,L):-length(L,Length).
-row_builder(Length,L1,R):- add_elem(0,L1,L2),
+row_builder(Length,L1,R):- add_elem(.,L1,L2),
                            row_builder(Length,L2,R).
 
 % cria uma representacao de matriz NxN (Ex. N = 3 [[0,0,0],[0,0,0],[0,0,0]]) USA ESSA PRA GERAR TABULEIRO
@@ -74,13 +75,22 @@ get_diagonal2([H|L],L1,Length,R):-get_elem(Length,H,Y),
                                   Z is Length-1,
                                   get_diagonal2(L,L2,Z,R).
 
+% verifica se deu velha, retorna true caso nao tenha mais nenhum espaco vazio. Retorna 1 se tabuleiro cheio
+draw([],1).
+draw([H|L],R):-not(member('.',H)),
+             draw(L,R).
+
 % verifica vitoria
 % retorna 1 se vitoria, 0 se empate USA ESSA PARA VERIFICAR SITUACAO DO TABULEIRO
 win(E,L,R):-win_rows(E,L,R);
             win_diagonal1(E,L,R);
             win_diagonal2(E,L,R);
-            win_columns(E,L,1,R),!,fail.
-win(_,_,0).            
+            win_columns(E,L,1,R);
+            draw(L,R),!,fail.
+win(_,_,0).
+
+
+% pessoa contra pessoa
 
 % faz a jogada (muda um valor da matriz)                                 
 % recebe uma lista e retorna uma lista de lista 
@@ -105,3 +115,50 @@ replace_matrix(L,Pos,E,NL):-length(L,T),
                             replace_list(X,Pos,E,Y),
                             reverse(Y,Z),
                             group(Z,T,T,[],[],NL).
+
+% interface com o usuario
+
+cls:-write('\e[H\e[2J'). % limpa a tela
+
+inicio:-tamanho(N),jogo(N),!.  
+
+board_length(N):-repeat, 
+                 get_length,
+                 read(N), N>2, !. % repete enquanto N <= 2
+
+get_length:-write('Jogo da Velha NxN, Informe o tamanho do tabuleiro:'), nl.
+
+inicialize(N):-board_builder(N,[],M),
+               printBoard(M),
+               state(M,N).
+             
+state(M,N):-get_position1(Pos1,N),
+            replace_matrix(M,Pos1,'X',NM),
+            printBoard(NM),
+            win('X',NM,R),
+            end(R),
+            get_position2(Pos2,N),
+            replace_matrix(NM,Pos2,'O',NM2),
+            printBoard(NM2),
+            win('O',NM2,R2),
+            end(R2),
+            state(NM2,N).
+
+get_position1(Pos,N):-repeat,
+                      position1,
+                      read(Pos),
+                      Pos < N*N + 1. 
+
+position1:-write('Informe a posicao (1 ~ N*N): player 1'),nl.
+
+get_position2(Pos,N):-repeat,
+                      position2,
+                      read(Pos),
+                      Pos < N*N + 1. 
+
+position2:-write('Informe a posicao (1 ~ N*N): player 2'),nl.
+
+
+end(1):-write('Game over!'),nl.
+end(0):-write('Proximo jogador!'),nl.
+    
